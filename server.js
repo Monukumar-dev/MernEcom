@@ -14,6 +14,11 @@ app.use(express.json()); // For parsing JSON
 // Routes
 app.use('/api/users', userRoutes);
 
+// Catch-All Route for Undefined Routes
+app.use((req, res) => {
+  res.status(404).send('404: Not Found');
+});
+
 // Home Route
 app.get('/', (req, res) => {
     res.send('API is running...');
