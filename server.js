@@ -20,8 +20,14 @@ app.use((req, res) => {
 });
 
 // Home Route
+// Define a route
 app.get('/', (req, res) => {
-    res.send('API is running...');
+    try {
+        res.send('Hello, Vercel!');
+    } catch (err) {
+        console.error('Error:', err);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
 // Start Server
