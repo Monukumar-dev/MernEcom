@@ -16,7 +16,7 @@ app.use('/api/users', userRoutes);
 
 // Catch-All Route for Undefined Routes
 app.use((req, res) => {
-  res.status(404).send('404: Not Found');
+  res.status(404).send('404: Not Found Undefined Routes');
 });
 
 // Home Route
