@@ -1,4 +1,4 @@
 PORT=5000
 MONGO_URI=mongodb+srv://mern2:uX2HrHYDiu%40h35i@cluster0.oabuchd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-
 JWT_SECRET=6f8d7c34a9b0f12e2d49acbfe123456789abcd123456ef
+JWT_REFRESH_SECRET=f13d1e2d6d76f37b5ae659dcbf07b5cdbb875b29fa3c82f60e9c8f9f46769a67b374e81e4b9432f48c1fa48b3df02cfc92d9a7ad3c17392462f6b2e7c832ba64
