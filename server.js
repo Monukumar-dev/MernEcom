@@ -9,18 +9,13 @@ connectDB();
 
 const app = express();
 app.use(cors());
-app.use(express.json()); // For parsing JSON
+app.use(express.json()); 
 
 // Routes
 app.use('/api/users', userRoutes);
 
-// Catch-All Route for Undefined Routes
-app.use((req, res) => {
-  res.status(404).send('404: Not Found Undefined Routes Monu');
-});
 
 // Home Route
-// Define a route
 app.get('/', (req, res) => {
     try {
         res.send('Hello, Vercel!');
@@ -28,6 +23,12 @@ app.get('/', (req, res) => {
         console.error('Error:', err);
         res.status(500).send('Internal Server Error');
     }
+});
+
+
+// Catch-All Route for Undefined Routes
+app.use((req, res) => {
+    res.status(404).send('404: Not Found Undefined Routes Monu');
 });
 
 // Start Server
