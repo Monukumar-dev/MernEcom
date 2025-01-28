@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 
 // Generate Access Token
 const generateAccessToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '15m' });
+    return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '2h' });
 };
 
 // Generate Refresh Token
@@ -14,7 +14,7 @@ const generateRefreshToken = (id) => {
 
 // Register User
 const registerUser = async (req, res) => {
-    const { name, email, password } = req.body;
+    const { name, lName, email, password ,mobile, gender, dob } = req.body;
 
     try {
         const userExists = await User.findOne({ email });
@@ -22,7 +22,7 @@ const registerUser = async (req, res) => {
             return res.status(400).json({ message: 'User already exists' });
         }
 
-        const user = await User.create({ name, email, password });
+        const user = await User.create({ name, lName, email, password, mobile, gender, dob });
 
         if (user) {
             const accessToken = generateAccessToken(user.id);

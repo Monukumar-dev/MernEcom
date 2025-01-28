@@ -8,11 +8,42 @@ const userSchema = new mongoose.Schema(
             type: String, 
             required: [true, 'Name is required'] 
         },
+        lName: { 
+            type: String, 
+            required: [true, 'Last Name is required'] 
+        },
+        mobile: { 
+            type: Number, 
+            required: [true, 'Mobile number is required'],
+            validate: {
+                validator: function(value) {
+                  return /^[0-9]{10}$/.test(value);
+                },
+                message: 'Mobile number must be exactly 10 digits'
+              }
+        },
         email: { 
             type: String, 
             required: [true, 'Email is required'], 
             unique: true,
             match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email address']
+        },
+        gender: {
+            type: String,
+            required: [true, 'Gender is required'],
+            enum: ['Male', 'Female', 'Other'],
+            message: 'Gender must be Male, Female, or Other'
+        },
+        dob: {
+            type: Date,
+            required: [true, 'Date of birth is required'],
+            validate: {
+              validator: function(value) {
+                // Ensures the date is not a future date (optional)
+                return value <= new Date();
+              },
+              message: 'Date of birth cannot be in the future'
+            }
         },
         password: { 
             type: String, 
