@@ -22,19 +22,24 @@ const registerUser = async (req, res) => {
             return res.status(400).json({ message: 'User already exists' });
         }
 
-        // Create a new user
         const user = await User.create({ name, email, password });
 
         if (user) {
             const accessToken = generateAccessToken(user.id);
             const refreshToken = generateRefreshToken(user.id);
+
             user.refreshToken = refreshToken;
             await user.save();
 
-            res.status(201).json({
-                accessToken,
-                refreshToken,
+            // Send refresh token as an httpOnly cookie
+            res.cookie('refreshToken', refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+                sameSite: 'strict',
+                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
             });
+
+            res.status(201).json({ accessToken });
         } else {
             res.status(400).json({ message: 'Invalid user data' });
         }
@@ -44,7 +49,7 @@ const registerUser = async (req, res) => {
 };
 
 // Login User
-const authUser = async (req, res) => {
+const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     try {
@@ -56,10 +61,15 @@ const authUser = async (req, res) => {
             user.refreshToken = refreshToken;
             await user.save();
 
-            res.json({
-                accessToken,
-                refreshToken, 
+            // Send refresh token as an httpOnly cookie
+            res.cookie('refreshToken', refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 7 * 24 * 60 * 60 * 1000,
             });
+
+            res.json({ accessToken });
         } else {
             res.status(401).json({ message: 'Invalid email or password' });
         }
@@ -68,9 +78,8 @@ const authUser = async (req, res) => {
     }
 };
 
-// Refresh Token Endpoint
 const refreshToken = async (req, res) => {
-    const { refreshToken } = req.body;
+    const { refreshToken } = req.cookies; // Get refreshToken from cookies
 
     if (!refreshToken) {
         return res.status(401).json({ message: 'Refresh token is required' });
@@ -83,6 +92,7 @@ const refreshToken = async (req, res) => {
         if (!user || user.refreshToken !== refreshToken) {
             return res.status(403).json({ message: 'Invalid refresh token' });
         }
+
         const accessToken = generateAccessToken(user.id);
         res.json({ accessToken });
     } catch (error) {
@@ -90,9 +100,10 @@ const refreshToken = async (req, res) => {
     }
 };
 
+
 // Logout User
 const logoutUser = async (req, res) => {
-    const { refreshToken } = req.body;
+    const { refreshToken } = req.cookies; // Get refreshToken from cookies
 
     if (!refreshToken) {
         return res.status(400).json({ message: 'Refresh token is required' });
@@ -102,16 +113,19 @@ const logoutUser = async (req, res) => {
         const user = await User.findOne({ refreshToken });
 
         if (!user) {
+            res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'strict' });
             return res.status(400).json({ message: 'User not found' });
         }
 
-        user.refreshToken = null; 
+        user.refreshToken = null; // Remove the refresh token from the database
         await user.save();
 
+        res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'strict' });
         res.status(200).json({ message: 'Logged out successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
-module.exports = { registerUser, authUser, refreshToken, logoutUser };
+
+module.exports = { registerUser, loginUser, refreshToken, logoutUser };
