@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 
 // Generate Access Token
 const generateAccessToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '2h' });
+    return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '5m' });
 };
 
 // Generate Refresh Token
@@ -61,14 +61,16 @@ const loginUser = async (req, res) => {
             user.refreshToken = refreshToken;
             await user.save();
 
-            // Send refresh token as an httpOnly cookie
-            res.cookie('refreshToken', refreshToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
-                maxAge: 7 * 24 * 60 * 60 * 1000,
-            });
+            // Allow credentials to be sent
+            res.setHeader('Access-Control-Allow-Credentials', 'true');
 
+            // Set the cookie properly
+            res.cookie("refreshToken", refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "lax",  // Use "strict" or "lax" if frontend and backend are same-origin
+                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+            });
             res.json({ accessToken });
         } else {
             res.status(401).json({ message: 'Invalid email or password' });

@@ -4,12 +4,18 @@ const connectDB = require('./config/db');
 const userRoutes = require('./routes/userRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const cors = require('cors');
+const cookieParser = require("cookie-parser");
 
 dotenv.config();
 connectDB();
 
 const app = express();
-app.use(cors());
+//app.use(cors());
+app.use(cors({
+    origin: process.env.FRONT_URL,  // Frontend URL (Adjust in production)
+    credentials: true,  // Allow cookies to be sent
+}));
+app.use(cookieParser());
 app.use(express.json()); 
 
 // Routes
