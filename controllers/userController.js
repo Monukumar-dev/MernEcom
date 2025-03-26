@@ -68,7 +68,7 @@ const loginUser = async (req, res) => {
             res.cookie("refreshToken", refreshToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
-                sameSite: "lax",  // Use "strict" or "lax" if frontend and backend are same-origin 
+                sameSite: "strict",  // Use "strict" or "lax" if frontend and backend are same-origin 
                 maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
             });
             res.json({ accessToken });
